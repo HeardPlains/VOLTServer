@@ -1,0 +1,128 @@
+/* * {
+    display: block;
+} */
+body {
+  background-color: #eff1f3;
+  background-image: url("/images/dark-triangles.png");
+  background-repeat: repeat;
+  padding-top: 10px;
+  width: 90%;
+}
+button{
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: #4682b4;
+    color: #fff;
+}
+.jumbotron {
+  overflow: hidden;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  padding: 1rem 2rem;
+}
+
+.navbar {
+  background-color: #4682b4;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  color: white;
+}
+.nav-link {
+  color: white;
+}
+.nav-item {
+  background-color: #4682b4;
+}
+.navbar-brand {
+  color: #fff;
+}
+.table-title{
+  align-items: center;
+  text-align: center;
+}
+.display-table {
+  padding: 5px;
+  width: 100%;
+  height: 100%;
+  border-style: solid;
+  float: left;
+  box-sizing: border-box;
+  border-radius: 10px;
+  margin: 10px;
+}
+.display-table table {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.75rem;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.display-table td,
+.display-table th {
+  border-top: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
+  padding: 8px;
+}
+
+.display-table tr {
+  height: 1rem;
+}
+
+.display-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.display-table tr:hover {
+  background-color: #ddd;
+}
+
+.display-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4682b4;
+  color: white;
+}
+
+.show_table {
+  padding: 5px;
+  width: 47%;
+  height: 100%;
+  border-style: solid;
+  box-sizing: border-box;
+  border-radius: 10px;
+  margin: 0 auto;
+}
+.show_table table {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.show_table td,
+.show_table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.show_table tr {
+  height: 1rem;
+}
+
+.show_table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.show_table tr:hover {
+  background-color: #ddd;
+}
+
+.show_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4682b4;
+  color: white;
+}

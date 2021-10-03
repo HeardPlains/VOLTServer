@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
+
+    <div class="jumbotron">
+      <h1>Tasks:</h1>
+      <hr />
+      <div>
+        <h3>Add Task</h3>
+        <form action="/api/task_data" method="post" autocomplete="off">
+          <input type="text" name="display_name" placeholder="Task Name" />
+          <button type="submit" name="submit">Submit</button>
+        </form>
+      </div>
+      <hr />
+      <div>
+        <h3>Remove Task</h3>
+        <form
+          action="/api/task_data/remove"
+          method="post"
+          autocomplete="off"
+        >
+          <select type="task" name="task" placeholder="task">
+            <% for(var i = 0; i < tasks.length; i++) { %>
+            <option value="<%= tasks[i].display_name %>">
+              <%= tasks[i].display_name %>
+            </option>
+            <% } %>
+          </select>
+          <button type="submit" name="submit">Submit</button>
+        </form>
+      </div>
+      <hr />
+      <div>
+        <div class="show_table">
+          <h3>Tasks Table:</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>ID</th>
+            </tr>
+            <% for (var i = 0; i < tasks.length; i++) { %>
+            <tr>
+              <td><%= tasks[i].id %></td>
+              <td><%= tasks[i].display_name %></td>
+            </tr>
+            <% } %>
+          </table>
+        </div>
+      </div>
+    </div>
+    <footer><%- include('../partials/footer'); %></footer>
+  </body>
+</html>
