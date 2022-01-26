@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body >
+    <header><%- include('../partials/header'); %></header>
+    
+    <div class="jumbotron">
+      <h1>Employees:</h1>
+      <hr />
+      <div>
+        <h3>Add Employee</h3>
+        <form action="/api/employee_data" method="post" autocomplete="off">
+          <input type="text" name="first_name" placeholder="First Name" />
+          <input type="text" name="last_name" placeholder="Last Name" />
+          <select
+            type="location_code"
+            name="location_code"
+            placeholder="location code"
+          >
+            <% for(var i = 0; i < locations.length; i++) { %>
+            <option value="<%= locations[i].display_name %>">
+              <%= locations[i].display_name %>
+            </option>
+            <% } %>
+          </select>
+          <button type="submit" name="submit">Submit</button>
+        </form>
+      </div>
+      <hr />
+      <div>
+        <h3>Change Employee Location</h3>
+        <form action="/api/employee_data/update" method="post" autocomplete="off">
+          <select type="employee" name="employee" placeholder="employee">
+            <% for(var i = 0; i < employees.length; i++) { %>
+            <option
+              value="<%= employees[i].first_name  + " " + employees[i].last_name %>"
+            >
+              <%= employees[i].first_name + " " + employees[i].last_name %>
+            </option>
+            <% } %>
+          </select>
+          <select type="location_code" name="location_code" placeholder="location code">
+            <% for(var i = 0; i < locations.length; i++) { %>
+            <option value="<%= locations[i].display_name %>">
+              <%= locations[i].display_name %>
+            </option>
+            <% } %>
+          </select>
+          <button type="submit" name="submit">Submit</button>
+        </form>
+      </div>
+      <hr />
+      <div>
+        <h3>Remove Employee</h3>
+        <form
+          action="/api/employee_data/remove"
+          method="post"
+          autocomplete="off"
+        >
+          <select type="employee" name="employee" placeholder="employee">
+            <% for(var i = 0; i < employees.length; i++) { %>
+            <option
+              value="<%= employees[i].first_name + " " + employees[i].last_name %>"
+            >
+              <%= employees[i].first_name + " " + employees[i].last_name %>
+            </option>
+            <% } %>
+          </select>
+          <button type="submit" name="submit">Submit</button>
+        </form>
+      </div>
+      <hr />
+      <div>
+        <div class="show_table">
+          <h3>Employee Table:</h3>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Current Location</th>
+            </tr>
+            <% for (var i = 0; i < employees.length; i++) { %>
+            <tr>
+              <td><%= employees[i].first_name + " " + employees[i].last_name %></td>
+              <td><%= employees[i].current_location %></td>
+            </tr>
+            <% } %>
+          </table>
+        </div>
+      </div>
+    </div>
+    <footer><%- include('../partials/footer'); %></footer>
+  </body>
+</html>

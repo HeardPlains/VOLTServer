@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+    <script>
+        function exportTableToExcel(tableID, filename = "") {
+        var downloadLink;
+        var dataType = "application/vnd.ms-excel";
+        var tableSelect = document.getElementById(tableID);
+        var tableHTML = tableSelect.outerHTML.replace(/ /g, "%20");
+
+        // Specify file name
+        filename = filename ? filename + ".xls" : "excel_data.xls";
+
+        // Create download link element
+        downloadLink = document.createElement("a");
+
+        document.body.appendChild(downloadLink);
+
+        if (navigator.msSaveOrOpenBlob) {
+          var blob = new Blob(["\ufeff", tableHTML], {
+            type: dataType,
+          });
+          navigator.msSaveOrOpenBlob(blob, filename);
+        } else {
+          // Create a link to the file
+          downloadLink.href = "data:" + dataType + ", " + tableHTML;
+
+          // Setting the file name
+          downloadLink.download = filename;
+
+          //triggering the function
+          downloadLink.click();
+        }
+      }
+      function editActiveTable(button){
+      // console.log(button.parentNode.parentNode.id);
+       
+        var tableSelect = document.getElementById(button.parentNode.parentNode.id);
+        var buttonParent = button.parentNode;
+        var id = tableSelect.id;
+       
+        if (button.innerHTML != "Submit Changes"){
+          button.innerHTML = "Submit Changes"
+          console.log(tableSelect.children.name);
+          editcellText(tableSelect.children.name, "text", "name", "edit_name",tableSelect.children.name.innerHTML)
+          editCellListLocations(tableSelect.children.location, "location_code", "edit_location",tableSelect.children.location.innerHTML)
+          editCellListTasks(tableSelect.children.task, "task_code", "edit_task",tableSelect.children.task.innerHTML)
+          editcellDate(tableSelect.children.date, "date", "date", "edit_date",tableSelect.children.date.innerHTML)
+        }
+        else{
+          
+
+          document.getElementById("first_name_edit."+id).value = tableSelect.children.name.children.edit_name.value.split(" ")[0];
+          document.getElementById("last_name_edit."+id).value = tableSelect.children.name.children.edit_name.value.split(" ")[1];
+          document.getElementById("location_edit."+id).value = tableSelect.children.location.children.edit_location.value
+          document.getElementById("time_in_edit."+id).value = tableSelect.children.time_in.innerHTML
+          document.getElementById("task_edit."+id).value = tableSelect.children.task.children.edit_task.value
+          var date = tableSelect.children.date.children.edit_date.value.split("-")
+          var formatedDate = date[1] + "/" + date[2] + "/" + date[0];
+          document.getElementById("date_edit."+id).value = formatedDate;
+          document.getElementById("editActiveForm."+id).submit()
+          
+        }
+      }
+      function editFinalTable(button){
+       //console.log(button.parentNode.parentNode.id);
+       
+        var tableSelect = document.getElementById(button.parentNode.parentNode.id);
+        var buttonParent = button.parentNode;
+        var id = tableSelect.id;
+
+       
+        if (button.innerHTML != "Submit Changes"){
+          button.innerHTML = "Submit Changes"
+          console.log(tableSelect.children.name);
+        editcellText(tableSelect.children.name, "text", "name", "edit_name",tableSelect.children.name.innerHTML)
+        editcellNumber(tableSelect.children.hours, "number", "hours", "edit_hours",.1, tableSelect.children.hours.innerHTML)
+        editCellListLocations(tableSelect.children.location, "location_code", "edit_location",tableSelect.children.location.innerHTML)
+        editCellListTasks(tableSelect.children.task, "task_code", "edit_task",tableSelect.children.task.innerHTML)
+        editcellDate(tableSelect.children.date, "date", "date", "edit_date",tableSelect.children.date.innerHTML)
+        }else{
+      
+
+          document.getElementById("first_name_edit."+id).value = tableSelect.children.name.children.edit_name.value.split(" ")[0];
+          document.getElementById("last_name_edit."+id).value = tableSelect.children.name.children.edit_name.value.split(" ")[1];
+          document.getElementById("hours_edit."+id).value = tableSelect.children.hours.children.edit_hours.value
+          document.getElementById("location_edit."+id).value = tableSelect.children.location.children.edit_location.value
+          document.getElementById("task_edit."+id).value = tableSelect.children.task.children.edit_task.value
+          var date = tableSelect.children.date.children.edit_date.value.split("-")
+          var formatedDate = date[1] + "/" + date[2] + "/" + date[0];
+          document.getElementById("date_edit."+id).value = formatedDate;
+          document.getElementById("editFinalForm."+id).submit()
+          
+        }
+      }
+
+      function reformatDate(date){
+        var dateArray = date.split("/");
+        var formatDate = dateArray[2] + '-' + dateArray[0] +'-'+ dateArray[1];
+        return formatDate;
+      }
+
+      function editcellText(element,type, name,id, placeholder){
+        
+        g = document.createElement('input');
+        g.setAttribute("type", type);
+        g.setAttribute("id",id)
+        g.setAttribute("name", name);
+        g.setAttribute("value",placeholder)
+        element.innerHTML = "";
+        element.appendChild(g);
+      }
+      function editcellDate(element,type, name, id, placeholder){
+        g = document.createElement('input');
+        g.setAttribute("type", type);
+        g.setAttribute("name", name);
+        g.setAttribute("id",id)
+        g.setAttribute("value",reformatDate(placeholder))
+        element.innerHTML = "";
+        element.appendChild(g);
+      }
+      function editcellNumber(element,type, name,id, step, placeholder){
+        g = document.createElement('input');
+        g.setAttribute("type", type);
+        g.setAttribute("id", id);
+        g.setAttribute("name", name);
+        g.setAttribute("step", step);
+        g.setAttribute("value",placeholder)
+        element.innerHTML = "";
+        element.appendChild(g);
+      }
+      function editCellListLocations(element, name, id,placeholder){
+        select = document.createElement('select');
+        select.setAttribute("name", name);
+        select.setAttribute("id",id)
+        select.setAttribute("placeholder",placeholder)
+        var locations = [];
+        locations.push(placeholder)
+        '<% for (var i=0, len = locations.length; i<len; i++) { %>'
+          locations.push('<%- locations[i].display_name %>');
+        ' <% } %>' 
+        console.table(locations)
+        for(var i = 0; i < locations.length; i++) { 
+          e = document.createElement('option');
+          e.setAttribute("value",locations[i]);
+          e.innerHTML = locations[i];
+          select.appendChild(e)
+        }
+        element.innerHTML = "";
+        element.appendChild(select)
+      }
+      function editCellListTasks(element,name, id, placeholder){
+        select = document.createElement('select');
+        select.setAttribute("name", name);
+        select.setAttribute("id",id)
+        select.setAttribute("placeholder",placeholder)
+        var tasks = [];
+        tasks.push(placeholder)
+        '<% for (var i=0, len = tasks.length; i<len; i++) { %>'
+          tasks.push('<%- tasks[i].display_name %>');
+        ' <% } %>' 
+        console.table(tasks)
+        for(var i = 0; i < tasks.length; i++) { 
+          e = document.createElement('option');
+          e.setAttribute("value",tasks[i]);
+          e.innerHTML = tasks[i];
+          select.appendChild(e)
+        }
+        element.innerHTML = "";
+        element.appendChild(select)
+      }
+    </script>
+  </head>
+  <body>
+    <header><%- include('../partials/header'); %></header>
+    <main>
+      <div class="jumbotron">
+        <h1>Hello <%= user.username %> </h1>
+        <div class="active_table">
+          <h3>Active Time Sheet:</h3>
+
+          <table class="js-sort-table">
+            <thead>
+              <th></th>
+              <th>Name</th>
+              <th>Time In</th>
+              <th>Location</th>
+              <th>Task</th>
+              <th>Date</th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </thead>
+            <tbody>
+            <% for (var i = 0; i < sheet.length; i++) { %>
+            <tr  id=<%= sheet[i].id %> > 
+              <td>
+          
+                <input type="checkbox" id=<%= sheet[i].id %> name=<%= sheet[i].first_name + " " + sheet[i].last_name %>>
+              
+            </td>
+            <form
+                id="editActiveForm.<%= sheet[i].id %>"
+                method="post"
+                autocomplete="off"
+                action="/api/active/update">
+                <input type="hidden" name="id" value="<%= sheet[i].id %>" />
+                <input type="hidden" name="first_name" id="first_name_edit.<%= sheet[i].id %>" value="" />
+                <input type="hidden" name="last_name" id="last_name_edit.<%= sheet[i].id %>" value="" />
+                <input type="hidden" name="time_in" id="time_in_edit.<%= sheet[i].id %>" value="" />
+                <input type="hidden" name="location" id="location_edit.<%= sheet[i].id %>" value="" />
+                <input type="hidden" name="task" id="task_edit.<%= sheet[i].id %>" value="" />
+                <input type="hidden" name="date" id="date_edit.<%= sheet[i].id %>" value="" />
+                <td id="name"><%= sheet[i].first_name + " " + sheet[i].last_name %></td>
+                <td id="time_in"><%= sheet[i].time_in %></td>
+                <td id="location"><%= sheet[i].location_code %></td>
+                <td id="task"><%= sheet[i].task_code %></td>
+                <td id="date"><%= sheet[i].date %></td>
+                <td>
+                  <button type="button" onclick="editActiveTable(this)" value="Submit Changes"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                  </svg></button>
+                </td>
+              </form>
+              <td>
+                <form
+                  action="/api/active/remove"
+                  method="post"
+                  autocomplete="off"
+                >
+                  <input type="hidden" name="id" value="<%= sheet[i].id %>" />
+                  <button type="submit" name="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                  </svg></button>
+                </form>
+              </td>
+              <td>
+                <form
+                  action="/api/final"
+                  method="post"
+                  autocomplete="off"
+                >
+                  <input
+                    type="hidden"
+                    name="first_name"
+                    value="<%= sheet[i].first_name  %>"
+                  />
+                  <input
+                    type="hidden"
+                    name="last_name"
+                    value="<%= sheet[i].last_name  %>"
+                  />
+                  <button type="submit" name="submit">Check Out</button>
+                </form>
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
+          </table>
+        </div>
+        <div class="active_table">
+          <h3>Final Time Sheet:</h3>
+          <table id="final_table" class="js-sort-table">
+            <thead>
+              <th></th>
+              <th class="js-sort-string">Name</th>
+              <th>Hours</th>
+              <th>Location</th>
+              <th>Task</th>
+              <th>Date</th>
+              <th>Time In</th>
+              <th>Time Out</th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </thead>
+            <tbody>
+              <% for (var i = 0; i < finalSheet.length; i++) { %>
+              <tr  id=<%= finalSheet[i].id %>  >
+                
+                <td>
+            
+                    <input type="checkbox" id=<%= finalSheet[i].id %> name=<%= finalSheet[i].first_name + " " + finalSheet[i].last_name %>>
+                  
+                </td>
+                <form
+                  id="editFinalForm.<%= finalSheet[i].id %>"
+                  method="post"
+                  autocomplete="off"
+                  action="/api/final/update">
+                  <input type="hidden" name="id" value="<%= finalSheet[i].id %>" />
+                  <input type="hidden" name="first_name" id="first_name_edit.<%= finalSheet[i].id %>" value="" />
+                  <input type="hidden" name="last_name" id="last_name_edit.<%= finalSheet[i].id %>" value="" />
+                  <input type="hidden" name="hours" id="hours_edit.<%= finalSheet[i].id %>" value="" />
+                  <input type="hidden" name="location" id="location_edit.<%= finalSheet[i].id %>" value="" />
+                  <input type="hidden" name="task" id="task_edit.<%= finalSheet[i].id %>" value="" />
+                  <input type="hidden" name="date" id="date_edit.<%= finalSheet[i].id %>" value="" />
+                  <td id="name"><%= finalSheet[i].first_name + " " + finalSheet[i].last_name %></td>
+                  <td id="hours"><%= finalSheet[i].hours %></td>
+                  <td id="location"><%= finalSheet[i].location_code %></td>
+                  <td id="task"><%= finalSheet[i].task_code %></td>
+                  <td id="date"><%= finalSheet[i].date %></td>
+                  <td id="time_in"><%= finalSheet[i].time_in %></td>
+                  <td id="time_out"><%= finalSheet[i].time_out %></td>
+                  <td></td>
+                  
+                  <td>
+                    <button type="button" onclick="editFinalTable(this)" value="Submit Changes"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                    </svg></button>
+                  </td>
+                </form>
+                <td>
+                  <form
+                    action="/api/final/remove"
+                    method="post"
+                    autocomplete="off"
+                  >
+                    <input type="hidden" name="id" value="<%= finalSheet[i].id %>" />
+                    <button type="submit" name="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg></button>
+                  </form>
+                </td>
+              </tr>
+              <% } %>
+            </tbody>
+          </table>
+          <button onclick="exportTableToExcel('final_table', 'time_sheet')">
+            Export Table Data To Excel File
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <footer><%- include('../partials/footer'); %></footer>
+  </body>
+</html>
