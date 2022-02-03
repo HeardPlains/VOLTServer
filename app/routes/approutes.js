@@ -60,12 +60,12 @@ module.exports = function (app) {
   //////////////////////////////////////////////////
 
   //Foreman Calls/////////////////
-  app
-    .route("/api/foreman")
-    .get(todoList.list_all_foreman_data)
-    .post(todoList.create_foreman);
-  app.route("/api/foreman/remove").post(todoList.removeForeman);
-  app.route("/api/foreman/update").post(todoList.updateForeman);
+  // app
+  //   .route("/api/foreman")
+  //   .get(todoList.list_all_foreman_data)
+  //   .post(todoList.create_foreman);
+  // app.route("/api/foreman/remove").post(todoList.removeForeman);
+  // app.route("/api/foreman/update").post(todoList.updateForeman);
   /////////////////////////////
 
   //Employee Calls//////////

@@ -25,6 +25,24 @@
             </option>
             <% } %>
           </select>
+          <select
+            type="task_code"
+            name="task_code"
+            placeholder="task_code"
+          >
+            <% for(var i = 0; i < tasks.length; i++) { %>
+            <option value="<%= tasks[i].display_name %>">
+              <%= tasks[i].display_name %>
+            </option>
+            <% } %>
+          </select>
+          <label>
+            <input type="checkbox"  
+            name="location_code"
+            placeholder="location code">
+            Foreman?
+          </label>
+          
           <button type="submit" name="submit">Submit</button>
         </form>
       </div>

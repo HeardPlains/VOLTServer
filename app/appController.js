@@ -38,7 +38,7 @@ async function createTempUser() {
 
 createTempUser();
 
-function isAuthentiicated(req, res) {
+function isAuthenticated(req, res) {
   if (!req.isAuthenticated()) {
     res.redirect("/login");
   }
@@ -105,7 +105,7 @@ exports.postRegister = async (req, res) => {
 };
 
 exports.show_task_page = function (req, res) {
-  isAuthentiicated(req, res);
+  isAuthenticated(req, res);
 
   TaskData.getAllTaskData(function (err, task) {
     if (err) res.send(err);
@@ -117,7 +117,7 @@ exports.show_task_page = function (req, res) {
 };
 
 exports.show_location_page = function (req, res) {
-  isAuthentiicated(req, res);
+  isAuthenticated(req, res);
 
   LocationData.getAllLocationData(function (err, location) {
     if (err) res.send(err);
@@ -129,7 +129,7 @@ exports.show_location_page = function (req, res) {
 };
 
 exports.show_foreman_page = function (req, res) {
-  isAuthentiicated(req, res);
+  isAuthenticated(req, res);
 
   LocationData.getAllLocationData(function (err, location) {
     if (err) res.send(err);
@@ -138,6 +138,7 @@ exports.show_foreman_page = function (req, res) {
       if (err) res.send(err);
       var foremanArray = Object.values(JSON.parse(JSON.stringify(foreman)));
       res.render(__dirname + "/views/pages/foreman.ejs", {
+        
         locations: locationArray,
         foreman: foremanArray,
       });
@@ -146,24 +147,28 @@ exports.show_foreman_page = function (req, res) {
 };
 
 exports.show_employee_page = function (req, res) {
-  isAuthentiicated(req, res);
-
-  LocationData.getAllLocationData(function (err, location) {
+  isAuthenticated(req, res);
+  TaskData.getAllTaskData(function (err, task) {
     if (err) res.send(err);
-    var locationArray = Object.values(JSON.parse(JSON.stringify(location)));
-    EmployeeData.getAllEmployeeData(function (err, employee) {
+    var taskArray = Object.values(JSON.parse(JSON.stringify(task)));
+    LocationData.getAllLocationData(function (err, location) {
       if (err) res.send(err);
-      var employeeArray = Object.values(JSON.parse(JSON.stringify(employee)));
-      res.render(__dirname + "/views/pages/employees.ejs", {
-        locations: locationArray,
-        employees: employeeArray,
+      var locationArray = Object.values(JSON.parse(JSON.stringify(location)));
+      EmployeeData.getAllEmployeeData(function (err, employee) {
+        if (err) res.send(err);
+        var employeeArray = Object.values(JSON.parse(JSON.stringify(employee)));
+        res.render(__dirname + "/views/pages/employees.ejs", {
+          tasks: taskArray,
+          locations: locationArray,
+          employees: employeeArray,
+        });
       });
     });
   });
 };
 
 exports.show_dash_page = function (req, res) {
-  isAuthentiicated(req, res);
+  isAuthenticated(req, res);
 
   var locationArray, taskArray;
   LocationData.getAllLocationData(function (err, res) {
@@ -280,6 +285,9 @@ exports.update_employee_status = function (req, res) {
 };
 
 exports.remove_active_time_sheet = function (req, res) {
+  EmployeeData.updateEmployeeStatus(req.body.emp_id, 0, function (err, task) {
+    if (err) res.send(err);
+  });
   ActiveTimeSheet.remove(req.body.id, function (err, task) {
     console.log("controller");
     if (err) res.send(err);
@@ -312,56 +320,56 @@ exports.create_final_time_entry = function (req, res) {
       : d.getMonth + 1;
   var year = d.getFullYear();
   var date = month + "/" + day + "/" + year;
-  console.log(req.body.emp_id)
-  ActiveTimeSheet.getTimeByEmpId(
-    req.body.emp_id,
-    function (err, task) {
-      console.log("Signing Out");
-      if (err) res.send(err);
-      console.log("App Data", task)
-      console.log("App Data", task[0].time_in)
-      if (task != null) {
-        console.log(task[0].time_in)
-        var time_in = timeToDouble(task[0].time_in);
-        var d = new Date();
-        var time_out = timeToDouble(d.toTimeString().split(" ")[0]);
-        var hour = time_out - time_in;
-        if (hour < 0) {
-          hour = 24 + hour;
-        }
-        FinalTimeSheet.createTimeEntry(
-          1,
-          task[0].emp_id,
-          task[0].first_name,
-          task[0].last_name,
-          hour.toFixed(2),
-          task[0].location_code,
-          task[0].task_code,
-          117,
-          date,
-          task[0].time_in,
-          d.toTimeString().split(" ")[0],
-          function (err, task) {
-            if (err) res.send(err);
-            
-          }
-        );
-        ActiveTimeSheet.remove(task[0].id, function (err, removed) {
-          console.log("controller");
+  console.log(req.body.emp_id);
+  ActiveTimeSheet.getTimeByEmpId(req.body.emp_id, function (err, task) {
+    console.log("Signing Out");
+    if (err) res.send(err);
+    console.log("App Data", task);
+    console.log("App Data", task[0].time_in);
+    if (task != null) {
+      console.log(task[0].time_in);
+      var time_in = timeToDouble(task[0].time_in);
+      var d = new Date();
+      var time_out = timeToDouble(d.toTimeString().split(" ")[0]);
+      var hour = time_out - time_in;
+      if (hour < 0) {
+        hour = 24 + hour;
+      }
+      FinalTimeSheet.createTimeEntry(
+        1,
+        task[0].emp_id,
+        task[0].first_name,
+        task[0].last_name,
+        hour.toFixed(2),
+        task[0].location_code,
+        task[0].task_code,
+        117,
+        date,
+        task[0].time_in,
+        d.toTimeString().split(" ")[0],
+        function (err, task) {
           if (err) res.send(err);
-          console.log("Remove User", removed);
-        });
-        EmployeeData.updateEmployeeStatus(
-          task[0].emp_id,
-          0,
-          function (err, task) {
-            if (err) res.send(err);
+        }
+      );
+      ActiveTimeSheet.remove(task[0].id, function (err, removed) {
+        console.log("controller");
+        if (err) res.send(err);
+        console.log("Remove User", removed);
+      });
+      EmployeeData.updateEmployeeStatus(
+        task[0].emp_id,
+        0,
+        function (err, emp_status) {
+          console.log("Updating User Status");
+          if (err) res.send(err);
+          console.log("Status Update", emp_status);
+          if (req.body.platform != null) {
             res.redirect("back");
           }
-        );
-      }
+        }
+      );
     }
-  );
+  });
 };
 
 exports.create_final_time_entry_with_time = function (req, res) {
@@ -373,56 +381,52 @@ exports.create_final_time_entry_with_time = function (req, res) {
       : d.getMonth + 1;
   var year = d.getFullYear();
   var date = month + "/" + day + "/" + year;
-  console.log(req.body.emp_id)
-  ActiveTimeSheet.getTimeByEmpId(
-    req.body.emp_id,
-    function (err, task) {
-      console.log("Signing Out");
-      if (err) res.send(err);
-      console.log("App Data", task)
-      console.log("App Data", task[0].time_in)
-      if (task != null) {
-        console.log(task[0].time_in)
-        var time_in = timeToDouble(task[0].time_in);
-        var d = new Date();
-        var time_out = timeToDouble(d.toTimeString().split(" ")[0]);
-        var hour = time_out - time_in;
-        if (hour < 0) {
-          hour = 24 + hour;
-        }
-        FinalTimeSheet.createTimeEntry(
-          1,
-          task[0].emp_id,
-          task[0].first_name,
-          task[0].last_name,
-          hour.toFixed(2),
-          task[0].location_code,
-          task[0].task_code,
-          117,
-          req.body.date,
-          task[0].time_in,
-          req.body.time_out,
-          function (err, task) {
-            if (err) res.send(err);
-            
-          }
-        );
-        ActiveTimeSheet.remove(task[0].id, function (err, removed) {
-          console.log("controller");
-          if (err) res.send(err);
-          console.log("Remove User", removed);
-        });
-        EmployeeData.updateEmployeeStatus(
-          task[0].emp_id,
-          0,
-          function (err, task) {
-            if (err) res.send(err);
-            res.redirect("back");
-          }
-        );
+  console.log(req.body.emp_id);
+  ActiveTimeSheet.getTimeByEmpId(req.body.emp_id, function (err, task) {
+    console.log("Signing Out");
+    if (err) res.send(err);
+    console.log("App Data", task);
+    console.log("App Data", task[0].time_in);
+    if (task != null) {
+      console.log(task[0].time_in);
+      var time_in = timeToDouble(task[0].time_in);
+      var d = new Date();
+      var time_out = timeToDouble(d.toTimeString().split(" ")[0]);
+      var hour = time_out - time_in;
+      if (hour < 0) {
+        hour = 24 + hour;
       }
+      FinalTimeSheet.createTimeEntry(
+        1,
+        task[0].emp_id,
+        task[0].first_name,
+        task[0].last_name,
+        hour.toFixed(2),
+        task[0].location_code,
+        task[0].task_code,
+        117,
+        req.body.date,
+        task[0].time_in,
+        req.body.time_out,
+        function (err, task) {
+          if (err) res.send(err);
+        }
+      );
+      ActiveTimeSheet.remove(task[0].id, function (err, removed) {
+        console.log("controller");
+        if (err) res.send(err);
+        console.log("Remove User", removed);
+      });
+      EmployeeData.updateEmployeeStatus(
+        task[0].emp_id,
+        0,
+        function (err, task) {
+          if (err) res.send(err);
+          res.redirect("back");
+        }
+      );
     }
-  );
+  });
 };
 
 exports.create_active_time_entry = function (req, res) {
@@ -594,42 +598,38 @@ exports.create_active_time_entry_with_time = function (req, res) {
       : d.getMonth + 1;
   var year = d.getFullYear();
   var date = month + "/" + day + "/" + year;
-  EmployeeData.getEmployeeFromEmpId(
-    req.body.emp_id,
-    function (err, emp) {
-      console.log("controller");
+  EmployeeData.getEmployeeFromEmpId(req.body.emp_id, function (err, emp) {
+    console.log("controller");
+    if (err) res.send(err);
+    ActiveTimeSheet.getTimeByEmpId(emp[0].emp_id, function (err, isActive) {
       if (err) res.send(err);
-        ActiveTimeSheet.getTimeByEmpId(emp[0].emp_id, function (err, isActive) {
-          if (err) res.send(err);
-          if (isActive[0] == null) {
-            ActiveTimeSheet.createTimeEntry(
-              1,
-              emp[0].emp_id,
-              emp[0].first_name,
-              emp[0].last_name,
-              req.body.time_in,
-              emp[0].current_location,
-              emp[0].current_task,
-              117,
-              req.body.date,
-              function (err, task) {
-                if (err) res.send(err);
-                //res.json(task);
-              }
-            );
-            EmployeeData.updateEmployeeStatus(
-              req.body.emp_id,
-              1,
-              function (err, task) {
-                if (err) res.send(err);
-                res.json(task);
-              }
-            );
+      if (isActive[0] == null) {
+        ActiveTimeSheet.createTimeEntry(
+          1,
+          emp[0].emp_id,
+          emp[0].first_name,
+          emp[0].last_name,
+          req.body.time_in,
+          emp[0].current_location,
+          emp[0].current_task,
+          117,
+          req.body.date,
+          function (err, task) {
+            if (err) res.send(err);
+            //res.json(task);
           }
-        });
+        );
+        EmployeeData.updateEmployeeStatus(
+          req.body.emp_id,
+          1,
+          function (err, task) {
+            if (err) res.send(err);
+            res.json(task);
+          }
+        );
       }
-    
-  );
+    });
+  });
 };
 
 exports.updateActiveTimeSheet = function (req, res) {
